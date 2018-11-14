@@ -10,30 +10,31 @@ check_ret () {
 country="US"
 state="CA"
 city="SJ"
-cn="front-end-vip-fqdn.com"
-orgname="Philips"
+cn="db.tcook.com"
+orgname="tcook"
 
 
 ca_cert_pem () {
 
-  openssl genrsa 2048 > ca.key
+  openssl genrsa 2048 > ca-key.pem
+  #openssl genrsa 2048 > ca.key
   check_ret "ssl keygen creation "
 
-  #openssl req -new -x509 -nodes -days 3600 -key ca-key.pem -out ca.pem -subj "/C=$country/ST=$state/L=$city/O=$orgname/CN=$cn"
-  openssl req -new -key ca.key -out cert.csr -subj "/C=$country/ST=$state/L=$city/O=$orgname/CN=$cn"
+  openssl req -new -x509 -nodes -days 3600 -key ca-key.pem -out ca.pem -subj "/C=$country/ST=$state/L=$city/O=$orgname/CN=$cn"
+  #openssl req -new -key ca.key -out cert.csr -subj "/C=$country/ST=$state/L=$city/O=$orgname/CN=$cn"
   check_ret "CA cert pem creation "
 }
 
 server_cert_pem () {
-  #openssl req -newkey rsa:2048 -days 3600 -nodes -subj "/C=$country/ST=$state/L=$city/O=$orgname/CN=$cn" -keyout server-key.pem -out server-req.pem
-  openssl x509 -req -days 365 -in cert.csr -signkey ca.key -out ca.crt
+  openssl req -newkey rsa:2048 -days 3600 -nodes -subj "/C=$country/ST=$state/L=$city/O=$orgname/CN=$cn" -keyout server-key.pem -out server-req.pem
+  #openssl x509 -req -days 365 -in cert.csr -signkey ca.key -out ca.crt
   check_ret "server side req creation "
 
-  #openssl rsa -in server-key.pem -out server-key.pem
-  #check_ret "server side key creation "
+  openssl rsa -in server-key.pem -out server-key.pem
+  check_ret "server side key creation "
 
-  #openssl x509 -req -in server-req.pem -days 3600 -CA ca.pem -CAkey ca-key.pem -set_serial 01 -out server-cert.pem
-  #check_ret "server side certificate creation "
+  openssl x509 -req -in server-req.pem -days 3600 -CA ca.pem -CAkey ca-key.pem -set_serial 01 -out server-cert.pem
+  check_ret "server side certificate creation "
 }
 
 create_pem () {
@@ -58,5 +59,5 @@ copy_files () {
 
 ca_cert_pem
 server_cert_pem
-create_pem
-copy_files
+#create_pem
+#copy_files
